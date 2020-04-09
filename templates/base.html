@@ -15,8 +15,12 @@
     <div class="headerMain">
         <div class="divHead"><h1><a href="/">ВСРЦ</a></h1></div>
         <div class="divHead"><h1><a href="/"> Великая Священная Русская Церковь</a></h1></div>
+        {% if current_user.is_authenticated %}
+        <div class="divHead"></div><a class="navbar-brand" href="/logout">{{ current_user.name }}</a></div>
+        {% else %}
         <div class="divHead" id="register"><a class="btn btn-primary " href="/register">Зарегистрироваться</a></div>
         <div class="divHead" id="login"><a class="btn btn-success" href="/login">Войти</a></div>
+        {% endif %}
     </div>
     <div class="headerMainDown">
         <div class="divHead"><h2><a href="/store">Магазин</a></h2></div>
