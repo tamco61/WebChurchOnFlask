@@ -36,11 +36,7 @@ class RegisterForm(FlaskForm):
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя пользователя', validators=[DataRequired()])
     surname = StringField('Фамилия пользователя', validators=[DataRequired()])
-    age = IntegerField('Ваш возраст', validators=[DataRequired()])
-    position = StringField("Ваша должность", validators=[DataRequired()])
-    speciality = StringField("Ваша специальность", validators=[DataRequired()])
-    address = StringField("Ваш адрес", validators=[DataRequired()])
-    submit = SubmitField('Зарегитрироваться')
+    submit = SubmitField('Зарегиcтрироваться')
 
 
 @app.route('/')
@@ -79,11 +75,7 @@ def register():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            surname=form.surname.data,
-            age=form.age.data,
-            position=form.position.data,
-            address=form.address.data,
-            speciality=form.speciality.data)
+            surname=form.surname.data,)
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
