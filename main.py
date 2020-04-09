@@ -1,8 +1,13 @@
 from flask import Flask, render_template
+from flask_wtf import FlaskForm
+from wtforms.validators import DataRequired
+from wtforms import PasswordField, TextAreaField, StringField, SubmitField, BooleanField, IntegerField
+from wtforms.fields.html5 import EmailField
+from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 
 
 from data import db_session
-
+from data.users import User
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
