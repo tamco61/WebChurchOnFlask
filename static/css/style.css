@@ -1,13 +1,25 @@
 #register
 {
-    padding-left: 173%;
+    position: absolute;
+    top: 10px;
+    right: 80px;
 }
 
-#login{
-    padding-left: 96%;
+#login
+{
+    position: absolute;
+    top: 10px;
+    right: 0;
 }
-
-#account{
-    padding-left: 96%;
+#account
+{
+    position: absolute;
+    top: 10px;
+    right: 80px;
 }
-
+#logout
+{
+    position: absolute;
+    top: 10px;
+    right: 0;
+}
