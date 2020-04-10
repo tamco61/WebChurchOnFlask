@@ -8,6 +8,7 @@ from flask_login import current_user, LoginManager, login_user, logout_user, log
 from data import db_session
 from data.users import User
 from data.products import Product
+from data.sales import Sale
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
