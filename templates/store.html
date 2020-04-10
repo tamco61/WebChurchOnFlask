@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<main role="main" class="container">
-{% for i in price_lst%}
-<ul>
-    <li>Артикль {{i[0]}}</li>
-    <li>Имя товара: {{i[1]}}</li>
-    <li>Продавец: {{i[2][0]}}{{i[2][1]}}</li>
-    <li>Количество: {{i[3]}}</li>
-    <li>Цена: {{i[4]}} руб.</li>
-</ul>
-<br>
-<br>
-{% endfor %}
-</main>
+<div class="container">
+    <div class="row">
+        {% for i in price_lst%}
+            <div class="col-md-4">
+                  <div class="card mb-4 shadow-sm">
+                    <img class="bd-placeholder-img card-img-top" width="100%" height="400" src="../static/img/img{{i[0]}}.jpg" role="img" aria-label="Placeholder: Thumbnail">
+                    <div class="card-body">
+                      <p class="card-text">{{i[1]}}</p>
+                        <p class="card-text">Продавец: {{i[2][0]}} {{i[2][1]}}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-outline-secondary">Купить</button>
+                        </div>
+                        <p class="text-muted">{{i[4]}} руб.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
