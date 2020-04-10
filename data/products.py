@@ -12,6 +12,7 @@ class Product(SqlAlchemyBase):
     count = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     price = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     address = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    image = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True)
 
     user = orm.relation('User')
     sales = orm.relation("Sale", back_populates='products')
