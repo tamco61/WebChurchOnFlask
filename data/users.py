@@ -1,5 +1,6 @@
 import datetime
 import sqlalchemy
+from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -15,9 +16,10 @@ class User(SqlAlchemyBase, UserMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
+    privileges = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now)
+    modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    products = orm.relation("Product", back_populates='user')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
