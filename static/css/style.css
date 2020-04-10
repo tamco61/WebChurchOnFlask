@@ -2,24 +2,24 @@
 {
     position: absolute;
     top: 10px;
-    right: 80px;
+    right: 160px;
 }
 
 #login
 {
     position: absolute;
     top: 10px;
-    right: 0;
+    right: 90px;
 }
 #account
 {
     position: absolute;
     top: 10px;
-    right: 80px;
+    right: 160px;
 }
 #logout
 {
     position: absolute;
     top: 10px;
-    right: 0;
+    right: 90px;
 }
