@@ -5,7 +5,6 @@ from wtforms import PasswordField, TextAreaField, StringField, SubmitField, Bool
 from wtforms.fields.html5 import EmailField
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 
-
 from data import db_session
 from data.users import User
 
@@ -88,6 +87,11 @@ def register():
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/contacts')
+def cont():
+    return render_template('contacts.html', title='Контакты')
 
 
 def main():
