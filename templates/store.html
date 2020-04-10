@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<main role="main" class="container">
+{% for i in price_lst%}
+<ul>
+    <li>Артикль {{i[0]}}</li>
+    <li>Имя товара: {{i[1]}}</li>
+    <li>Продавец: {{i[2][0]}}{{i[2][1]}}</li>
+    <li>Количество: {{i[3]}}</li>
+    <li>Цена: {{i[4]}} руб.</li>
+</ul>
+<br>
+<br>
+{% endfor %}
+</main>
+{% endblock %}

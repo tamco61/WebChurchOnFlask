@@ -96,6 +96,24 @@ def cont():
     return render_template('contacts.html', title='Контакты')
 
 
+@app.route('/store')
+def store():
+    session = db_session.create_session()
+    lst = session.query(Product).all()
+    price_lst = list()
+    if lst:
+        for i in lst:
+            ls = list()
+            user = session.query(User).filter(User.id == i.seller).first()
+            ls.append(i.id)
+            ls.append(i.name)
+            ls.append((user.surname, user.name))
+            ls.append(i.count)
+            ls.append(i.price)
+
+            price_lst.append(ls)
+    return render_template('store.html', title='Магазин', price_lst=price_lst)
+
 def main():
     app.run()
 
