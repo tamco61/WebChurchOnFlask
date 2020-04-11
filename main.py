@@ -108,7 +108,6 @@ def store():
             ls.append(i.id)
             ls.append(i.name)
             ls.append((user.surname, user.name))
-            ls.append(i.count)
             ls.append(i.price)
 
             price_lst.append(ls)
