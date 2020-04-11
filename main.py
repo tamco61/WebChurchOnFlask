@@ -114,7 +114,6 @@ def store():
             ls.append(i.name)
             ls.append((user.surname, user.name))
             ls.append(i.price)
-
             price_lst.append(ls)
     return render_template('store.html', title='Магазин', price_lst=price_lst)
 
@@ -124,8 +123,8 @@ def end_buy(id):
     session = db_session.create_session()
     sale = session.query(Sale).filter(Sale.id == id).first()
     prod = session.query(Product).filter(Product.id == sale.item).first()
-    geocode.main(prod.address)
-    return render_template('order.html', title='Заказ')
+
+    return render_template('order.html', title='Заказ', ll=geocode.draw_map(prod.address))
 
 
 @app.route('/buy_product/<int:id>')
@@ -155,4 +154,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    geocode.remove()
