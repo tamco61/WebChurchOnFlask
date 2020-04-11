@@ -5,11 +5,12 @@ from wtforms import PasswordField, TextAreaField, StringField, SubmitField, Bool
 from wtforms.fields.html5 import EmailField
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from flask import jsonify, make_response
-
+from flask_admin import Admin
 from data import db_session
 from data.users import User
 from data.products import Product
 from data.sales import Sale
+from flask_admin.contrib.sqla import ModelView
 
 import geocode
 import products_api
@@ -17,11 +18,20 @@ import sales_api
 
 
 app = Flask(__name__)
+
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/database.sqlite")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Admin
+admin = Admin(app)
+session = db_session.create_session()
+admin.add_view(ModelView(User, session))
+admin.add_view(ModelView(Product, session))
+admin.add_view(ModelView(Sale, session))
 
 
 @app.errorhandler(404)
