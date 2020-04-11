@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, url_for
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import PasswordField, TextAreaField, StringField, SubmitField, BooleanField, IntegerField
 from wtforms.fields.html5 import EmailField
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from flask import jsonify, make_response
-from flask_admin import Admin
+from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from data import db_session
 from data.users import User
@@ -16,7 +16,6 @@ import geocode
 import products_api
 import sales_api
 
-
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
@@ -26,12 +25,29 @@ db_session.global_init("db/database.sqlite")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Admin
-admin = Admin(app)
+
+class AdminMixin:
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            return current_user.id in [1, 2]
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect('/')
+
+
+class AdminView(AdminMixin, ModelView):
+    pass
+
+
+class HomeAdminView(AdminMixin, AdminIndexView):
+    pass
+
+
+admin = Admin(app, 'Flask', url='/', index_view=HomeAdminView(name='Home'))
 session = db_session.create_session()
-admin.add_view(ModelView(User, session))
-admin.add_view(ModelView(Product, session))
-admin.add_view(ModelView(Sale, session))
+admin.add_view(AdminView(User, session))
+admin.add_view(AdminView(Product, session))
+admin.add_view(AdminView(Sale, session))
 
 
 @app.errorhandler(404)
@@ -97,7 +113,7 @@ def register():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            surname=form.surname.data,)
+            surname=form.surname.data)
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
