@@ -5,7 +5,8 @@ from wtforms import PasswordField, TextAreaField, StringField, SubmitField, Bool
 from wtforms.fields.html5 import EmailField
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
 from flask import jsonify, make_response
-from requests import get, delete, post, put
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from data import db_session
 from data.users import User
 from data.products import Product
@@ -18,10 +19,19 @@ import sales_api
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/database.sqlite")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Admin
+admin = Admin(app)
+session = db_session.create_session()
+admin.add_view(ModelView(User, session))
+admin.add_view(ModelView(Product, session))
+admin.add_view(ModelView(Sale, session))
 
 
 @app.errorhandler(404)
@@ -137,17 +147,24 @@ def end_buy(id):
     return render_template('order.html', title='Заказ', ll=geocode.draw_map(prod.address))
 
 
-@app.route('/create_order/<int:id>')
+@app.route('/buy_product/<int:id>')
 def buy_product(id):
     session = db_session.create_session()
-    prod = session.query(Product).filter(Product.id == id).first().seller
-    post('http://localhost:5000/api/sales', json={'seller': prod, 'item': id})
+    prod = session.query(Product).filter(Product.id == id).first()
+    sale = Sale()
+    sale.seller = prod.seller
+    sale.item = id
+    session.add(sale)
+    session.commit()
     return redirect(f'/order/{str(session.query(Sale).filter(Sale.item == id).first().id)}')
 
 
 @app.route('/del_sale/<int:id>')
 def close_trade(id):
-    delete(f'http://localhost:5000/api/sales/{str(id)}')
+    session = db_session.create_session()
+    sale = session.query(Sale).filter(Sale.id == id).first()
+    session.delete(sale)
+    session.commit()
     return redirect('/store')
 
 

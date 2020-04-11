@@ -15,3 +15,6 @@ class Product(SqlAlchemyBase, SerializerMixin):
 
     user = orm.relation('User')
     sales = orm.relation("Sale", back_populates='products')
+
+    def __repr__(self):
+        return f"Product id: {self.id}, name: {self.name}"

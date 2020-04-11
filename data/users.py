@@ -23,6 +23,9 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     products = orm.relation("Product", back_populates='user')
     sales = orm.relation("Sale", back_populates='user')
 
+    def __repr__(self):
+        return f"User id: {self.id}, name: {self.name + ' ' + self.surname}"
+
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 
