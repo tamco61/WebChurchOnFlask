@@ -20,7 +20,7 @@ def get_news():
 
 
 @blueprint.route('/api/products/<int:id>',  methods=['GET'])
-def get_one_news(id):
+def get_one_products(id):
     session = db_session.create_session()
     products = session.query(Product).get(id)
     if not products:
@@ -33,15 +33,14 @@ def get_one_news(id):
 
 
 @blueprint.route('/api/products', methods=['POST'])
-def create_news():
+def create_products():
     if not flask.request.json:
         return flask.jsonify({'error': 'Empty request'})
     elif not all(key in flask.request.json for key in
-                 ['id', 'name', 'seller', 'price', 'address']):
+                 ['name', 'seller', 'price', 'address']):
         return flask.jsonify({'error': 'Bad request'})
     session = db_session.create_session()
     prod = Product()
-    prod.id = flask.request.json['id']
     prod.name = flask.request.json['name']
     prod.seller = flask.request.json['seller']
     prod.price = flask.request.json['price']
@@ -51,8 +50,8 @@ def create_news():
     return flask.jsonify({'success': 'OK'})
 
 
-@blueprint.route('/api/news/<int:id>', methods=['DELETE'])
-def delete_news(id):
+@blueprint.route('/api/products/<int:id>', methods=['DELETE'])
+def delete_products(id):
     session = db_session.create_session()
     products = session.query(Product).get(id)
     if not products:
