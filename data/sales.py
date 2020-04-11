@@ -2,9 +2,10 @@ import sqlalchemy
 import datetime
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
+from sqlalchemy_serializer import SerializerMixin
 
 
-class Sale(SqlAlchemyBase):
+class Sale(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'sales'
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
