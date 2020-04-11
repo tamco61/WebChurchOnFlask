@@ -1,21 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    .content{
-        padding-left: 1%;}
-</style>
-Гит хаб сайта: <br>https://github.com/tamco61/WebChurchOnFlask
-<br>
-<br>
-Гит хабы разработчиков:  <br>
+    .contact-wrapper{
+        padding-left: 1%;
+    }
+    .contact-wrapper h5{
+        padding-left: 0.7%;
+    }
 
-<ul>
-    <li>
-https://github.com/tamco61
-        </li>
-    <li>
-    https://github.com/slewie
-    </li>
-</ul>
-Почта: rpc@gmail.com
+
+</style>
+<div class="contact-wrapper">
+    <h1 style="text-align:center">Разработчики</h1>
+    <h3>Репозиторий сайта: </h3> <h5><a href="https://github.com/tamco61/WebChurchOnFlask" class="text-secondary">https://github.com/tamco61/WebChurchOnFlask</a>
+</h5>
+
+    <h3>Гит хабы разработчиков: </h3>
+    <h5>
+
+        <a href="https://github.com/tamco61" class="text-secondary">https://github.com/tamco61</a>
+        <br>
+        <a href="https://github.com/slewie" class="text-secondary">https://github.com/slewie</a>
+
+    </h5>
+    <h3>Почта: <br><h5 class="text-secondary">vsrc@gmail.com</h5></h3>
+</div>
 {% endblock %}
