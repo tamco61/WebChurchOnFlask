@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired
 from wtforms import PasswordField, TextAreaField, StringField, SubmitField, BooleanField, IntegerField
 from wtforms.fields.html5 import EmailField
 from flask_login import current_user, LoginManager, login_user, logout_user, login_required
+import geocode
 
 from data import db_session
 from data.users import User
@@ -100,9 +101,13 @@ def cont():
 def store():
     session = db_session.create_session()
     lst = session.query(Product).all()
+    sales = session.query(Sale).all()
+    sales = [i.item for i in sales]
     price_lst = list()
     if lst:
         for i in lst:
+            if i.id in sales:
+                continue
             ls = list()
             user = session.query(User).filter(User.id == i.seller).first()
             ls.append(i.id)
@@ -113,9 +118,41 @@ def store():
             price_lst.append(ls)
     return render_template('store.html', title='Магазин', price_lst=price_lst)
 
+
+@app.route('/order/<int:id>')
+def end_buy(id):
+    session = db_session.create_session()
+    sale = session.query(Sale).filter(Sale.id == id).first()
+    prod = session.query(Product).filter(Product.id == sale.item).first()
+    geocode.main(prod.address)
+    return render_template('order.html', title='Заказ')
+
+
+@app.route('/buy_product/<int:id>')
+def buy_product(id):
+    session = db_session.create_session()
+    prod = session.query(Product).filter(Product.id == id).first()
+    sale = Sale()
+    sale.seller = prod.seller
+    sale.item = id
+    session.add(sale)
+    session.commit()
+    return redirect(f'/order/{str(session.query(Sale).filter(Sale.item == id).first().id)}')
+
+
+@app.route('/del_sale/<int:id>')
+def close_trade(id):
+    session = db_session.create_session()
+    sale = session.query(Sale).filter(Sale.id == id).first()
+    session.delete(sale)
+    session.commit()
+    return redirect('/store')
+
+
 def main():
     app.run()
 
 
 if __name__ == '__main__':
     main()
+    geocode.remove()
