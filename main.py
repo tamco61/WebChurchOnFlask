@@ -160,8 +160,9 @@ def end_buy(id):
     session = db_session.create_session()
     sale = session.query(Sale).filter(Sale.id == id).first()
     prod = session.query(Product).filter(Product.id == sale.item).first()
-
-    return render_template('order.html', title='Заказ', ll=geocode.draw_map(prod.address))
+    ll = geocode.draw_map(prod.address)
+    text = geocode.get_full_address(ll)
+    return render_template('order.html', title='Заказ', ll=ll, text=text)
 
 
 @app.route('/create_order/<int:id>')
@@ -199,14 +200,15 @@ def view_profile():
     session = db_session.create_session()
     sales = session.query(Sale).all()
     sales_lst = list()
-    for i in sales:
-        if i.seller == current_user.id:
-            id = i.id
-            prod = session.query(Product).filter(Product.id == i.item).first()
-            item = prod.id
-            name = prod.name
-            sold_status = i.sold_status
-            sales_lst.append([id, item, name, sold_status])
+    if current_user.is_authenticated:
+        for i in sales:
+            if i.seller == current_user.id:
+                id = i.id
+                prod = session.query(Product).filter(Product.id == i.item).first()
+                item = prod.id
+                name = prod.name
+                sold_status = i.sold_status
+                sales_lst.append([id, item, name, sold_status])
     return render_template('profile.html', title='Профиль', sales_lst=sales_lst)
 
 
