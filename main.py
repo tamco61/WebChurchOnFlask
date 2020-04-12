@@ -166,36 +166,47 @@ def end_buy(id):
 
 @app.route('/create_order/<int:id>')
 def buy_product(id):
-    prod = session.query(Product).filter(Product.id == id).first().seller
-    post('http://localhost:5000/api/sales', json={'seller': current_user.id, 'item': id})
+    if current_user.is_authenticated:
+        session = db_session.create_session()
+        sale = Sale()
+        sale.seller = current_user.id
+        sale.item = id
+        session.add(sale)
+        session.commit()
     return redirect(f'/store')
 
 
 @app.route('/close_order/<int:id>')
 def close_order(id):
-    put(f'http://localhost:5000/api/sales/{id}')
+    session = db_session.create_session()
+    sales = session.query(Sale).get(id)
+    sales.sold_status = True
+    session.commit()
     return redirect('/profile')
 
 
 @app.route('/del_sale/<int:id>')
 def close_trade(id):
-    delete(f'http://localhost:5000/api/sales/{str(id)}')
+    session = db_session.create_session()
+    sales = session.query(Sale).get(id)
+    session.delete(sales)
+    session.commit()
     return redirect('/profile')
 
 
 @app.route('/profile')
 def view_profile():
     session = db_session.create_session()
-    sales = get('http://localhost:5000/api/sales').json()
-    lst = list()
+    sales = session.query(Sale).all()
     sales_lst = list()
-    for i in sales['sales']:
-        s = get(f'http://localhost:5000/api/sales/{str(i["id"])}').json()
-        if s['sales']['seller'] == current_user.id:
-            id = s['sales']['id']
-            name = get(f'http://localhost:5000/api/products/{str(id)}').json()['products']['name']
-            sold_status = s['sales']['sold_status']
-            sales_lst.append([id, name, sold_status])
+    for i in sales:
+        if i.seller == current_user.id:
+            id = i.id
+            prod = session.query(Product).filter(Product.id == i.item).first()
+            item = prod.id
+            name = prod.name
+            sold_status = i.sold_status
+            sales_lst.append([id, item, name, sold_status])
     return render_template('profile.html', title='Профиль', sales_lst=sales_lst)
 
 
