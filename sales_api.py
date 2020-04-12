@@ -1,6 +1,7 @@
 import flask
 from data import db_session
 from data.sales import Sale
+from flask_login import current_user
 
 blueprint = flask.Blueprint('sales_api', __name__,
                             template_folder='templates')

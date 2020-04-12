@@ -167,7 +167,7 @@ def end_buy(id):
 @app.route('/create_order/<int:id>')
 def buy_product(id):
     prod = session.query(Product).filter(Product.id == id).first().seller
-    post('http://localhost:5000/api/sales', json={'seller': prod, 'item': id})
+    post('http://localhost:5000/api/sales', json={'seller': current_user.id, 'item': id})
     return redirect(f'/order/{str(session.query(Sale).filter(Sale.item == id).first().id)}')
 
 
@@ -180,7 +180,17 @@ def close_trade(id):
 @app.route('/profile')
 def view_profile():
     session = db_session.create_session()
-    return render_template('profile.html', title='Профиль')
+    sales = get('http://localhost:5000/api/sales').json()
+    lst = list()
+    sales_lst = list()
+    for i in sales['sales']:
+        s = get(f'http://localhost:5000/api/sales/{str(i["id"])}').json()
+        if s['sales']['seller'] == current_user.id:
+            id = s['sales']['id']
+            name = get(f'http://localhost:5000/api/products/{str(id)}').json()['products']['name']
+            sold_status = s['sales']['sold_status']
+            sales_lst.append([id, name, sold_status])
+    return render_template('profile.html', title='Профиль', sales_lst=sales_lst)
 
 
 def main():
