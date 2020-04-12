@@ -32,7 +32,9 @@ body {
     top: 10px;
     right: 90px;
 }
-
+a.dropdown-item:active{
+    background-color: #343a40;
+}
 .wrapper {
 	display: flex;
 	flex-direction: column;
