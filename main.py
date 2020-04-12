@@ -30,7 +30,7 @@ login_manager.init_app(app)
 class AdminMixin:
     def is_accessible(self):
         if current_user.is_authenticated:
-            return current_user.id in [1, 2]
+            return current_user.privileges
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect('/')
