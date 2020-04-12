@@ -11,6 +11,7 @@ from data import db_session
 from data.users import User
 from data.products import Product
 from data.sales import Sale
+from requests import get, delete, post, put
 
 import geocode
 import products_api
@@ -163,25 +164,23 @@ def end_buy(id):
     return render_template('order.html', title='Заказ', ll=geocode.draw_map(prod.address))
 
 
-@app.route('/buy_product/<int:id>')
+@app.route('/create_order/<int:id>')
 def buy_product(id):
-    session = db_session.create_session()
-    prod = session.query(Product).filter(Product.id == id).first()
-    sale = Sale()
-    sale.seller = prod.seller
-    sale.item = id
-    session.add(sale)
-    session.commit()
+    prod = session.query(Product).filter(Product.id == id).first().seller
+    post('http://localhost:5000/api/sales', json={'seller': prod, 'item': id})
     return redirect(f'/order/{str(session.query(Sale).filter(Sale.item == id).first().id)}')
 
 
 @app.route('/del_sale/<int:id>')
 def close_trade(id):
-    session = db_session.create_session()
-    sale = session.query(Sale).filter(Sale.id == id).first()
-    session.delete(sale)
-    session.commit()
+    delete(f'http://localhost:5000/api/sales/{str(id)}')
     return redirect('/store')
+
+
+@app.route('/profile')
+def view_profile():
+    session = db_session.create_session()
+    return render_template('profile.html', title='Профиль')
 
 
 def main():
