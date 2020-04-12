@@ -168,13 +168,19 @@ def end_buy(id):
 def buy_product(id):
     prod = session.query(Product).filter(Product.id == id).first().seller
     post('http://localhost:5000/api/sales', json={'seller': current_user.id, 'item': id})
-    return redirect(f'/order/{str(session.query(Sale).filter(Sale.item == id).first().id)}')
+    return redirect(f'/store')
+
+
+@app.route('/close_order/<int:id>')
+def close_order(id):
+    put(f'http://localhost:5000/api/sales/{id}')
+    return redirect('/profile')
 
 
 @app.route('/del_sale/<int:id>')
 def close_trade(id):
     delete(f'http://localhost:5000/api/sales/{str(id)}')
-    return redirect('/store')
+    return redirect('/profile')
 
 
 @app.route('/profile')
