@@ -134,6 +134,11 @@ def cont():
     return render_template('contacts.html', title='Контакты')
 
 
+@app.route('/candle')
+def candle():
+    return render_template('candle.html', title='Молитвенник')
+
+
 @app.route('/store')
 def store():
     session = db_session.create_session()

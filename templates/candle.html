@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<audio id="player" src="../static/audio/sound.mp3"></audio>
+<div>
+	<button onclick="document.getElementById('player').play()">Воспроизведение</button>
+	<button onclick="document.getElementById('player').pause()">Пауза</button>
+	<button onclick="document.getElementById('player').volume+=0.1">Громкость +</button>
+	<button onclick="document.getElementById('player').volume-=0.1">Громкость -</button>
+</div>
+{% endblock %}
