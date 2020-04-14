@@ -131,7 +131,8 @@ def logout():
 
 @app.route('/contacts')
 def cont():
-    return render_template('contacts.html', title='Контакты')
+    ll = geocode.draw_map('Уфа, Космонавтов 4')
+    return render_template('contacts.html', title='Контакты', ll=ll)
 
 
 @app.route('/candle')
