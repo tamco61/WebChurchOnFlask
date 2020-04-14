@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<audio id="player" src="../static/audio/sound.mp3"></audio>
-<div>
-	<button onclick="document.getElementById('player').play()">Воспроизведение</button>
-	<button onclick="document.getElementById('player').pause()">Пауза</button>
-	<button onclick="document.getElementById('player').volume+=0.1">Громкость +</button>
-	<button onclick="document.getElementById('player').volume-=0.1">Громкость -</button>
+<audio id="player" src="../static/audio/sound.mp3"></audio><br>
+<img src="../static/img/candle.gif" class="rounded mx-auto d-block"><br>
+<div align="center">
+	<button class="btn btn-secondary" onclick="document.getElementById('player').play()">Воспроизведение</button>
+	<button class="btn btn-secondary" onclick="document.getElementById('player').pause()">Пауза</button>
+	<button class="btn btn-secondary" onclick="document.getElementById('player').volume+=0.1">Громкость +</button>
+	<button class="btn btn-secondary" onclick="document.getElementById('player').volume-=0.1">Громкость -</button>
 </div>
 {% endblock %}
