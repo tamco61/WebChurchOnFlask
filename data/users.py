@@ -6,6 +6,11 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
+import jwt
+from time import time
+from sys import getdefaultencoding
+
+getdefaultencoding()
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -17,6 +22,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
+    confirm_email = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     privileges = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
@@ -31,3 +37,17 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def send_token(self, expires_in=86400):
+        return jwt.encode(
+            {'user_id': self.id, 'exp': time() + expires_in},
+            'secret-key', algorithm='HS256').decode(encoding='UTF-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, 'secret-key',
+                            algorithms=['HS256'])['user_id']
+        except:
+            return
+        return User.query.get(id)

@@ -11,8 +11,9 @@ from data import db_session
 from data.users import User
 from data.products import Product
 from data.sales import Sale
-from requests import get, delete, post, put
-
+import jwt
+from time import time
+import smtplib
 import geocode
 import products_api
 import sales_api
@@ -49,6 +50,18 @@ session = db_session.create_session()
 admin.add_view(AdminView(User, session))
 admin.add_view(AdminView(Product, session))
 admin.add_view(AdminView(Sale, session))
+
+
+def send_email(text, recipient):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login("vrscrouch@gmail.com", 'webcrouchflask')
+    server.sendmail('vrscrouch@gmail.com"', recipient, text)
+
+
+def send_confirm_email(user):
+    token = user.send_token()
+    send_email(f"{ url_for('confirmed_email', token=token, _external=True) }", user.email)
 
 
 @app.errorhandler(404)
@@ -89,7 +102,7 @@ def login():
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(User).filter(User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
+        if user and user.check_password(form.password.data) and user.confirm_email:
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
@@ -118,8 +131,26 @@ def register():
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
-        return redirect('/')
+        send_confirm_email(user)
+        return redirect('/confirm_email')
     return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route('/confirm_email')
+def confirm_email():
+    return render_template('confirm_email.html', title='Подтвердите почту')
+
+
+@app.route('/confirm_email/<token>')
+def confirmed_email(token):
+    user_id = User.verify_reset_password_token(token)
+    if not user_id:
+        return redirect('/')
+    session = db_session.create_session()
+    user = session.query(User).filter(User.id == user_id).first()
+    user.confirm_email = True
+    session.commit()
+    return render_template('confirmed_email.html', title='Почта подтверждена')
 
 
 @app.route('/logout')
