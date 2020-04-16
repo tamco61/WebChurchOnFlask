@@ -50,4 +50,4 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                             algorithms=['HS256'])['user_id']
         except:
             return
-        return User.query.get(id)
+        return id

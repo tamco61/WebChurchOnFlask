@@ -56,12 +56,13 @@ def send_email(text, recipient):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login("vrscrouch@gmail.com", 'webcrouchflask')
-    server.sendmail('vrscrouch@gmail.com"', recipient, text)
+    server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text)
 
 
 def send_confirm_email(user):
     token = user.send_token()
-    send_email(f"{ url_for('confirmed_email', token=token, _external=True) }", user.email)
+    url = url_for('index', _external=True)[:-2]
+    send_email(url_for('confirmed_email', token=token), user.email)
 
 
 @app.errorhandler(404)
