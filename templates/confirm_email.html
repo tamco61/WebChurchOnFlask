@@ -1,4 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
     <h1 style="text-align:center;">На вашу почту было отправлено сообщение для ее подтверждения</h1>
+    <main role="main" class="container">
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.token.label }}<br>
+                {{ form.token(class="form-control") }}<br>
+                {% for error in form.token.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+            <div>{{ message }}</div>
+        </form>
+    </main>
 {% endblock %}
