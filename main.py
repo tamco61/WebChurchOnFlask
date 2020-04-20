@@ -56,13 +56,12 @@ def send_email(text, recipient):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login("vrscrouch@gmail.com", 'webcrouchflask')
-    text = f'Код подтверждения:\n{text}'
     server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text.encode('utf-8'))
 
 
 def send_confirm_email(user):
     token = user.send_token()
-    send_email(token, user.email)
+    send_email(url_for('confirm_email', token=token), user.email)
 
 
 @app.errorhandler(404)
@@ -90,11 +89,6 @@ class RegisterForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     submit = SubmitField('Зарегиcтрироваться')
-
-
-class ConfirmForm(FlaskForm):
-    token = StringField('Код подтверждения', validators=[DataRequired()])
-    submit = SubmitField('Подтвердить')
 
 
 @app.route('/')
@@ -142,21 +136,18 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/confirm_email', methods=['GET', 'POST'])
+@app.route('/confirm_email')
 def confirm_email():
-    form = ConfirmForm()
-    if form.validate_on_submit():
-        user_id = User.verify_reset_password_token(form.token.data)
-        if not user_id:
-            return render_template('confirm_email.html', title='Подтвердите почту', form=form, message='Попробуйте снова')
-        return redirect(f'/confirm_email/{form.token.data}')
-    return render_template('confirm_email.html', title='Подтвердите почту', form=form)
+    return render_template('confirm_email.html', title='Подтвердите почту')
 
 
 @app.route('/confirm_email/<token>')
 def confirmed_email(token):
+    user_id = User.verify_reset_password_token(token)
+    if not user_id:
+        return redirect('/')
     session = db_session.create_session()
-    user = session.query(User).filter(User.id == User.verify_reset_password_token(token)).first()
+    user = session.query(User).filter(User.id == user_id).first()
     user.confirm_email = True
     session.commit()
     return render_template('confirmed_email.html', title='Почта подтверждена')
