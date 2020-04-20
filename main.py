@@ -56,13 +56,12 @@ def send_email(text, recipient):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login("vrscrouch@gmail.com", 'webcrouchflask')
-    server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text)
+    server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text.encode('utf-8'))
 
 
 def send_confirm_email(user):
     token = user.send_token()
-    url = url_for('index', _external=True)[:-2]
-    send_email(url_for('confirmed_email', token=token), user.email)
+    send_email(url_for('confirm_email', token=token), user.email)
 
 
 @app.errorhandler(404)
@@ -212,6 +211,8 @@ def buy_product(id):
         sale.item = id
         session.add(sale)
         session.commit()
+        pr = session.query(Product).get(id)
+        send_email(f'Ваш заказ №{str(session.query(Sale).filter(Sale.item == id).first().id)} {pr.name}.\nЦеной {str(pr.price)} руб.\nГотов.\nВы можете забрать его по адресу: {geocode.get_full_address(pr.address)}', current_user.email)
     return redirect(f'/store')
 
 
@@ -221,6 +222,8 @@ def close_order(id):
     sales = session.query(Sale).get(id)
     sales.sold_status = True
     session.commit()
+    send_email(f'Спасибо за покупку!',current_user.email)
+
     return redirect('/profile')
 
 
@@ -230,6 +233,7 @@ def close_trade(id):
     sales = session.query(Sale).get(id)
     session.delete(sales)
     session.commit()
+    send_email(f'Ваш заказ №{sales.id}\n Отменён.',current_user.email)
     return redirect('/profile')
 
 
