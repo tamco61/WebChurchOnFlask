@@ -53,9 +53,6 @@ admin.add_view(AdminView(Sale, session))
 
 
 def send_email(text, recipient):
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login("vrscrouch@gmail.com", 'webcrouchflask')
     server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text.encode('utf-8'))
 
 
@@ -261,4 +258,7 @@ def main():
 
 
 if __name__ == '__main__':
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login("vrscrouch@gmail.com", 'webcrouchflask')
     main()
