@@ -180,10 +180,8 @@ def store():
             if i.id in sales:
                 continue
             ls = list()
-            user = session.query(User).filter(User.id == i.seller).first()
             ls.append(i.id)
             ls.append(i.name)
-            ls.append((user.surname, user.name))
             ls.append(i.price)
             price_lst.append(ls)
     return render_template('store.html', title='Магазин', price_lst=price_lst)
