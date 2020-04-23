@@ -2,6 +2,9 @@
 {% block content %}
 <div class="container">
     <div class="row">
+        {% if sales_lst == [] %}
+        <h1>Заказов нет</h1>
+        {% else %}
         {% for i in sales_lst%}
             <div class="col-md-4">
                   <div class="card mb-4 shadow-sm">
@@ -23,6 +26,7 @@
                   </div>
                 </div>
         {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
