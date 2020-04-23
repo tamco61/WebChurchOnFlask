@@ -27,6 +27,12 @@ db_session.global_init("db/database.sqlite")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+app.register_blueprint(sales_api.blueprint)
+app.register_blueprint(products_api.blueprint)
+
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
+server.login("vrscrouch@gmail.com", 'webcrouchflask')
 
 class AdminMixin:
     def is_accessible(self):
@@ -250,13 +256,8 @@ def view_profile():
 
 
 def main():
-    app.register_blueprint(sales_api.blueprint)
-    app.register_blueprint(products_api.blueprint)
     app.run()
 
 
 if __name__ == '__main__':
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login("vrscrouch@gmail.com", 'webcrouchflask')
     main()
