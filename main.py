@@ -17,6 +17,7 @@ import smtplib
 import geocode
 import products_api
 import sales_api
+from threading import Thread
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -30,9 +31,6 @@ login_manager.init_app(app)
 app.register_blueprint(sales_api.blueprint)
 app.register_blueprint(products_api.blueprint)
 
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login("vrscrouch@gmail.com", 'webcrouchflask')
 
 class AdminMixin:
     def is_accessible(self):
@@ -59,12 +57,15 @@ admin.add_view(AdminView(Sale, session))
 
 
 def send_email(text, recipient):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login("vrscrouch@gmail.com", 'webcrouchflask')
     server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text.encode('utf-8'))
 
 
 def send_confirm_email(user):
     token = user.send_token()
-    send_email(url_for('confirm_email', token=token), user.email)
+    Thread(target=send_email, args=(url_for('confirm_email', token=token), current_user.email)).start()
 
 
 @app.errorhandler(404)
@@ -213,7 +214,8 @@ def buy_product(id):
         session.add(sale)
         session.commit()
         pr = session.query(Product).get(id)
-        send_email(f'Ваш заказ №{str(session.query(Sale).filter(Sale.item == id).first().id)} {pr.name}.\nЦеной {str(pr.price)} руб.\nГотов.\nВы можете забрать его по адресу: {geocode.get_full_address(pr.address)}', current_user.email)
+        text = f'Ваш заказ №{str(session.query(Sale).filter(Sale.item == id).first().id)} {pr.name}.\nЦеной {str(pr.price)} руб.\nГотов.\nВы можете забрать его по адресу: {geocode.get_full_address(pr.address)}'
+        Thread(target=send_email, args=(text, current_user.email)).start()
     return redirect(f'/store')
 
 
@@ -223,8 +225,7 @@ def close_order(id):
     sales = session.query(Sale).get(id)
     sales.sold_status = True
     session.commit()
-    send_email(f'Спасибо за покупку!',current_user.email)
-
+    Thread(target=send_email, args=(f'Спасибо за покупку!', current_user.email)).start()
     return redirect('/profile')
 
 
@@ -234,7 +235,7 @@ def close_trade(id):
     sales = session.query(Sale).get(id)
     session.delete(sales)
     session.commit()
-    send_email(f'Ваш заказ №{sales.id}\n Отменён.',current_user.email)
+    Thread(target=send_email, args=(f'Ваш заказ №{sales.id}\n Отменён.', current_user.email)).start()
     return redirect('/profile')
 
 
