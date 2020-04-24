@@ -18,16 +18,18 @@ import geocode
 import products_api
 import sales_api
 from threading import Thread
+import os
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db_session.global_init("db/database.sqlite")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
+LOGIN = os.environ.get('LOGIN')
+PASSWORD = os.environ.get('PASSWORD')
 app.register_blueprint(sales_api.blueprint)
 app.register_blueprint(products_api.blueprint)
 
@@ -59,13 +61,14 @@ admin.add_view(AdminView(Sale, session))
 def send_email(text, recipient):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login("vrscrouch@gmail.com", 'webcrouchflask')
-    server.sendmail(from_addr='vrscrouch@gmail.com"', to_addrs=recipient, msg=text.encode('utf-8'))
+    server.login(LOGIN, PASSWORD)
+    server.sendmail(from_addr=LOGIN, to_addrs=recipient, msg=text.encode('utf-8'))
 
 
 def send_confirm_email(user):
     token = user.send_token()
-    Thread(target=send_email, args=(url_for('confirm_email', token=token), current_user.email)).start()
+    Thread(target=send_email,
+           args=(url_for('confirmed_email', token=token), user.email)).start()
 
 
 @app.errorhandler(404)
