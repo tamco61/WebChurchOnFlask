@@ -1,22 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
+    {% if get_flashed_messages() %}
+    <div class="alert alert-warning text-center" role="alert">
+        {{ get_flashed_messages()[0] }}
+    </div>
+    {% endif %}
     <div class="row">
         {% for i in price_lst%}
-            <div class="col-md-4">
-                  <div class="card mb-4 shadow-sm">
-                    <img class="bd-placeholder-img card-img-top" width="100%" height="400" src="../static/img/img{{i[0]}}.jpg" role="img" aria-label="Placeholder: Thumbnail">
-                    <div class="card-body">
-                      <p class="card-text">{{i[1]}}</p>
-                      <div class="d-flex justify-content-between align-items-center">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img class="bd-placeholder-img card-img-top" width="100%" height="400"
+                     src="../static/img/img{{i[0]}}.jpg" role="img" aria-label="Placeholder: Thumbnail">
+                <div class="card-body">
+                    <p class="card-text">{{i[1]}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <a href="/create_order/{{i[0]}}"><button type="button" class="btn btn-sm btn-outline-secondary">Купить</button></a>
+                            <a href="/create_order/{{i[0]}}">
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Купить</button>
+                            </a>
                         </div>
                         <p class="text-muted">{{i[2]}} руб.</p>
-                      </div>
                     </div>
-                  </div>
                 </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>

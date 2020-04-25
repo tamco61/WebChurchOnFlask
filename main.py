@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, abort, url_for
+from flask import Flask, render_template, redirect, request, abort, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import PasswordField, TextAreaField, StringField, SubmitField, BooleanField, IntegerField
@@ -11,8 +11,6 @@ from data import db_session
 from data.users import User
 from data.products import Product
 from data.sales import Sale
-import jwt
-from time import time
 import smtplib
 import geocode
 import products_api
@@ -23,13 +21,13 @@ import os
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 db_session.global_init("db/database.sqlite")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-LOGIN = os.environ.get('LOGIN')
-PASSWORD = os.environ.get('PASSWORD')
+LOGIN = "vrscrouch@gmail.com"
+PASSWORD = 'webcrouchflask'
 app.register_blueprint(sales_api.blueprint)
 app.register_blueprint(products_api.blueprint)
 
@@ -109,7 +107,7 @@ def login():
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(User).filter(User.email == form.email.data).first()
-        if user and user.check_password(form.password.data) and user.confirm_email:
+        if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
@@ -210,15 +208,20 @@ def end_buy(id):
 @app.route('/create_order/<int:id>')
 def buy_product(id):
     if current_user.is_authenticated:
-        session = db_session.create_session()
-        sale = Sale()
-        sale.seller = current_user.id
-        sale.item = id
-        session.add(sale)
-        session.commit()
-        pr = session.query(Product).get(id)
-        text = f'Ваш заказ №{str(session.query(Sale).filter(Sale.item == id).first().id)} {pr.name}.\nЦеной {str(pr.price)} руб.\nГотов.\nВы можете забрать его по адресу: {geocode.get_full_address(pr.address)}'
-        Thread(target=send_email, args=(text, current_user.email)).start()
+        if current_user.confirm_email:
+            session = db_session.create_session()
+            sale = Sale()
+            sale.seller = current_user.id
+            sale.item = id
+            session.add(sale)
+            session.commit()
+            pr = session.query(Product).get(id)
+            text = f'Ваш заказ №{str(session.query(Sale).filter(Sale.item == id).first().id)} {pr.name}.\nЦеной {str(pr.price)} руб.\nГотов.\nВы можете забрать его по адресу: {geocode.get_full_address(pr.address)}'
+            Thread(target=send_email, args=(text, current_user.email)).start()
+        else:
+            flash("Подтвердите почту для покупки", "warning")
+    else:
+        flash("Зарегистрируйтесь для покупки", "warning")
     return redirect(f'/store')
 
 
