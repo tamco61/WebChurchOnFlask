@@ -2,7 +2,7 @@ import requests
 import os
 
 
-def draw_map(address):
+def draw_map(address):  # отрисовка карты
     req = "http://geocode-maps.yandex.ru/1.x/" \
           "?apikey=40d1649f-0493-4b70-98ba-98533de7710b" \
           "&geocode={}&format=json".format(address)
@@ -17,7 +17,7 @@ def draw_map(address):
         return toponym_coodrinates
 
 
-def get_full_address(text):
+def get_full_address(text):  # получение полных координат места
     server = 'https://geocode-maps.yandex.ru/1.x/'
     params = {
         "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",

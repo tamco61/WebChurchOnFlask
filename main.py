@@ -11,12 +11,13 @@ from data import db_session
 from data.users import User
 from data.products import Product
 from data.sales import Sale
+from setting import LOGIN, PASSWORD, HOST, PORT
 import smtplib
 import geocode
-import products_api
-import sales_api
+from api import products_api, sales_api
 from threading import Thread
 import os
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -26,13 +27,11 @@ db_session.global_init("db/database.sqlite")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-LOGIN = "vrscrouch@gmail.com"
-PASSWORD = 'webcrouchflask'
 app.register_blueprint(sales_api.blueprint)
 app.register_blueprint(products_api.blueprint)
 
 
-class AdminMixin:
+class AdminMixin:  # класс, проверяющий наличие админки
     def is_accessible(self):
         if current_user.is_authenticated:
             return current_user.privileges
@@ -49,24 +48,25 @@ class HomeAdminView(AdminMixin, AdminIndexView):
     pass
 
 
-admin = Admin(app, 'Flask', url='/', index_view=HomeAdminView(name='Home'))
+admin = Admin(app, 'Flask', url='/', index_view=HomeAdminView(name='Home'))   # страница админа
 session = db_session.create_session()
 admin.add_view(AdminView(User, session))
 admin.add_view(AdminView(Product, session))
 admin.add_view(AdminView(Sale, session))
 
 
-def send_email(text, recipient):
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+def send_email(text, recipient):  # функция для отправки сообщений
+    server = smtplib.SMTP(HOST, PORT)
     server.starttls()
     server.login(LOGIN, PASSWORD)
     server.sendmail(from_addr=LOGIN, to_addrs=recipient, msg=text.encode('utf-8'))
 
 
-def send_confirm_email(user):
+def send_confirm_email(user):  # отправка токена с подтверждением почты
     token = user.send_token()
     Thread(target=send_email,
-           args=(url_for('confirmed_email', token=token), user.email)).start()
+           args=(url_for('confirmed_email', token=token), user.email)).start()  # ассинхронная отправка сообщений
+    # предотвращает торможение при подключении к почте и отправке сообщений
 
 
 @app.errorhandler(404)
@@ -147,7 +147,7 @@ def confirm_email():
 
 
 @app.route('/confirm_email/<token>')
-def confirmed_email(token):
+def confirmed_email(token):  # подтверждение почты
     user_id = User.verify_reset_password_token(token)
     if not user_id:
         return redirect('/')
@@ -167,8 +167,7 @@ def logout():
 
 @app.route('/contacts')
 def cont():
-    ll = geocode.draw_map('Уфа, Космонавтов 4')
-    return render_template('contacts.html', title='Контакты', ll=ll)
+    return render_template('contacts.html', title='Контакты')
 
 
 @app.route('/candle')
